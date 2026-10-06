@@ -1,0 +1,24 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+.ipynb_checkpoints/
+.pytest_cache/
+.mypy_cache/
+
+# Local corpora stay on disk. Commit only data/samples.
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+data/output/*
+!data/output/.gitkeep
+
+*.parquet
+spark-warehouse/
+metastore_db/
+derby.log
+reports/figures/*.png
+reports/figures/*.pdf
+!reports/figures/.gitkeep
