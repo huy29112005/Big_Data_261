@@ -30,12 +30,17 @@ class PipelineConfig:
     output_dir: Path = PROJECT_ROOT / "data" / "output"
     figures_dir: Path = PROJECT_ROOT / "reports" / "figures"
 
-    shingle_size: int = 3
-    num_features: int = 1 << 18
-    vectorizer: str = "hashing_tf"  # hashing_tf | count_vectorizer | dense
+    driver_memory: str = "4g"  # local mode: the driver is the only executor
+    min_chars: int = 0  # arXiv run uses 100; the short sample questions need 0
+    drop_exact_duplicates: bool = True
+    inject_frac: float = 0.01  # share of rows cloned as synthetic near-duplicates
+    max_dup_drop_rate: float = 0.30  # each clone drops uniform [0, this) of its words
 
-    lsh_family: str = "minhash"  # minhash | random_projection
-    num_hash_tables: int = 5  # bands b in the OR construction
+    shingle_size: int = 3  # word shingles
+    num_features: int = 1 << 18
+    vectorizer: str = "hashing_tf"  # hashing_tf | count_vectorizer
+
+    num_hash_tables: int = 5  # bands b; Spark uses b * r tables to generate signatures for custom banding
     rows_per_band: int = 2  # rows r in the AND construction; K = b * r
     band_grid: tuple[int, ...] = (5, 10, 20)
     row_grid: tuple[int, ...] = (2, 3, 4)
@@ -44,6 +49,5 @@ class PipelineConfig:
     query_id: str = "1"
 
     ground_truth_sample_size: int = 200
-    seed: int = 42
+    seed: int = 36
     shuffle_partitions: int = 8
-    bucket_length: float = 2.0  # BucketedRandomProjectionLSH only

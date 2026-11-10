@@ -31,15 +31,10 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--input", type=Path, help="Raw CSV or JSON corpus")
     parser.add_argument("--master", help="Spark master URL, default local[*]")
     parser.add_argument("--threshold", type=float, help="Jaccard similarity threshold")
-    parser.add_argument("--bands", type=int, help="numHashTables / OR bands b")
+    parser.add_argument("--bands", type=int, help="OR bands b")
     parser.add_argument("--rows", type=int, help="AND rows r inside a band")
     parser.add_argument("--k", type=int, help="Neighbors for approxNearestNeighbors")
     parser.add_argument("--query-id", help="Document id to probe")
-    parser.add_argument(
-        "--family",
-        choices=("minhash", "random_projection"),
-        help="LSH family",
-    )
     return parser.parse_args(argv)
 
 
@@ -59,8 +54,6 @@ def config_from_args(args: argparse.Namespace) -> PipelineConfig:
         config.neighbors_k = args.k
     if args.query_id:
         config.query_id = args.query_id
-    if args.family:
-        config.lsh_family = args.family
     config.processed_dir.mkdir(parents=True, exist_ok=True)
     config.output_dir.mkdir(parents=True, exist_ok=True)
     config.figures_dir.mkdir(parents=True, exist_ok=True)

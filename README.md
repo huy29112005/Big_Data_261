@@ -49,7 +49,7 @@ The project also evaluates different LSH configurations by varying the number of
 
    * File: `src/lsh_engine.py`
    * Choose `b` and `r` such that `K = b * r`
-   * Fit `MinHashLSH` or `BucketedRandomProjectionLSH`
+   * Use MinHash signatures for custom Jaccard banding, and use Spark MinHash for the baseline join and k-NN
    * Perform similarity join
    * Perform k-NN search
 

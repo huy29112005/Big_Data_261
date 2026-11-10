@@ -21,8 +21,7 @@ def brute_force_pairs(df: DataFrame, config: PipelineConfig) -> DataFrame:
     TODO(Member 3): M3-1
     Sample at most ``config.ground_truth_sample_size`` rows with
     ``config.seed``. For MinHash features, compute Jaccard similarity between
-    shingle sets (or between binary vectors). For random projection, compute
-    Euclidean distance. Emit ``id_a``, ``id_b``, ``similarity`` with
+    shingle sets (or between binary vectors). Emit ``id_a``, ``id_b``, ``similarity`` with
     ``id_a < id_b``. This is the O(n^2) reference the LSH join must beat.
     Keep the Cartesian product on the sample only.
     """

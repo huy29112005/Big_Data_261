@@ -1,16 +1,15 @@
-"""MinHash / random-projection LSH: parameter choice, join, and k-NN.
+"""MinHash LSH with Jaccard similarity: parameter choice, join, and k-NN.
 
 Owner: Member 2 — Distributed LSH Core & Retrieval Lead
 
 Spark ML notes for this module:
-- ``MinHashLSH`` and ``BucketedRandomProjectionLSH`` live in ``pyspark.ml.feature``.
+- ``MinHashLSH`` lives in ``pyspark.ml.feature``.
 - ``approxSimilarityJoin`` takes a *distance* threshold.
   Jaccard distance = 1 - Jaccard similarity.
-  Euclidean distance is already a distance; do not invert it.
 - A self-join emits both (a, b) and (b, a) plus self-matches.
   Keep pairs with ``datasetA.id < datasetB.id``.
-- ``numHashTables`` is Spark's OR-amplification width (bands). The textbook
-  construction is K = b * r with collision probability
+- Spark's built-in join uses one hash per band. Custom banding groups
+  K = b * r signatures into b bands of r rows, with collision probability
   P(s) = 1 - (1 - s^r)^b.
 """
 
@@ -49,25 +48,22 @@ def choose_bands_and_rows(
 
 
 def fit_lsh(df: DataFrame, config: PipelineConfig) -> Model:
-    """Fit the LSH model selected by ``config.lsh_family``.
+    """Fit the Spark MinHash baseline with one hash per band.
 
     TODO(Member 2): M2-2
-    - ``minhash``: ``MinHashLSH(inputCol="features", outputCol="hashes",
-      numHashTables=config.num_hash_tables)``.
-    - ``random_projection``: ``BucketedRandomProjectionLSH`` with
-      ``bucketLength=config.bucket_length`` and the same ``numHashTables``.
+    Use ``MinHashLSH(inputCol="features", outputCol="hashes",
+    numHashTables=config.num_hash_tables)`` for the baseline.
+    Custom banding needs b * r signatures from a separate fit.
     Input vectors come from Member 1's ``features`` column.
     """
     raise NotImplementedError("TODO(Member 2): M2-2 fit_lsh")
 
 
-def similarity_to_distance(similarity: float, family: str) -> float:
-    """Convert a similarity cutoff into the distance Spark expects.
+def similarity_to_distance(similarity: float) -> float:
+    """Convert a Jaccard similarity cutoff into the distance Spark expects.
 
     TODO(Member 2): M2-3
-    MinHash / Jaccard: return ``1 - similarity``.
-    Random projection / Euclidean: the configured threshold is already a
-    distance; return it unchanged.
+    Return ``1 - similarity``.
     """
     raise NotImplementedError("TODO(Member 2): M2-3 similarity_to_distance")
 
@@ -106,8 +102,7 @@ def approx_knn(
 def run_lsh(spark: SparkSession, features: DataFrame, config: PipelineConfig) -> dict[str, str]:
     """Fit LSH, write join pairs and a k-NN list, and return their paths.
 
-    Total hash functions follow the blueprint: K = b * r. Spark's
-    ``numHashTables`` is the band count b, not K.
+    The Spark baseline uses b hash functions. Custom banding will use b * r.
     """
     bands, rows = choose_bands_and_rows(config.similarity_threshold)
     config.num_hash_tables = bands
